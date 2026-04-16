@@ -55,3 +55,10 @@ coverage/
 # Logs
 logs/
 *.log
+
+# Database
+*.db
+*.db-journal
+
+# Process IDs
+*.pid

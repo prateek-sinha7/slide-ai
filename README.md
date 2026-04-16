@@ -416,6 +416,30 @@ pytest tests/test_integration_e2e.py -v
 
 ## 🐛 Troubleshooting
 
+### Python 3.14+ Compatibility Issues
+
+**Error:** `TypeError: ForwardRef._evaluate() missing 1 required keyword-only argument`
+
+**Solution:** Python 3.14 is too new. Use Python 3.9-3.13:
+```bash
+brew install python@3.13
+cd backend
+rm -rf venv
+python3.13 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Missing Rust Compiler
+
+**Error:** `error: can't find Rust compiler`
+
+**Solution:** Install Rust:
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source $HOME/.cargo/env
+```
+
 ### Ollama Not Running
 
 ```bash
@@ -452,6 +476,7 @@ cat logs/backend.log
 # 1. Missing .env file → Copy from .env.example
 # 2. Dependencies not installed → pip install -r requirements.txt
 # 3. Ollama not running → ollama serve
+# 4. Wrong Python version → Use Python 3.9-3.13
 ```
 
 ### Frontend Fails to Start
@@ -473,6 +498,8 @@ If generation times out:
 2. Reduce slide count
 3. Use a faster model (if available)
 4. Check system resources
+
+**For more detailed troubleshooting, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md)**
 
 ---
 

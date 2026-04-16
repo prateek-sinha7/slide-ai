@@ -67,8 +67,13 @@ fi
 
 # Kill any remaining processes on ports 8000 and 3000
 print_info "Checking for remaining processes on ports 8000 and 3000..."
-lsof -ti :8000 | xargs kill -9 2>/dev/null || true
-lsof -ti :3000 | xargs kill -9 2>/dev/null || true
+if command_exists lsof; then
+    lsof -ti :8000 | xargs kill -9 2>/dev/null || true
+    lsof -ti :3000 | xargs kill -9 2>/dev/null || true
+elif command_exists fuser; then
+    fuser -k 8000/tcp 2>/dev/null || true
+    fuser -k 3000/tcp 2>/dev/null || true
+fi
 
 echo ""
 print_success "All servers stopped"

@@ -3,7 +3,8 @@
 # AI PowerPoint Generator - Setup and Run Script
 # This script sets up and runs both backend and frontend servers
 
-set -e  # Exit on error
+# Don't exit on error - we'll handle errors gracefully
+# set -e
 
 # Colors for output
 RED='\033[0;31m'
@@ -36,7 +37,14 @@ command_exists() {
 
 # Function to check if a port is in use
 port_in_use() {
-    lsof -i :"$1" >/dev/null 2>&1
+    if command_exists lsof; then
+        lsof -i :"$1" >/dev/null 2>&1
+    elif command_exists netstat; then
+        netstat -an | grep -q ":$1 "
+    else
+        # Fallback: try to connect
+        (echo >/dev/tcp/localhost/$1) >/dev/null 2>&1
+    fi
 }
 
 # Function to kill process on port
@@ -44,9 +52,18 @@ kill_port() {
     local port=$1
     if port_in_use "$port"; then
         print_warning "Port $port is in use. Killing existing process..."
-        lsof -ti :"$port" | xargs kill -9 2>/dev/null || true
+        if command_exists lsof; then
+            lsof -ti :"$port" | xargs kill -9 2>/dev/null || true
+        elif command_exists fuser; then
+            fuser -k "$port/tcp" 2>/dev/null || true
+        fi
         sleep 2
     fi
+}
+
+# Function to get Python version
+get_python_version() {
+    python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")'
 }
 
 print_info "=========================================="
@@ -58,8 +75,51 @@ echo ""
 print_info "Checking prerequisites..."
 
 if ! command_exists python3; then
-    print_error "Python 3 is not installed. Please install Python 3.9 or higher."
+    print_error "Python 3 is not installed. Please install Python 3.9-3.13."
     exit 1
+fi
+
+# Check if virtual environment already exists with compatible Python
+VENV_PYTHON_OK=false
+if [ -f "backend/venv/bin/python" ]; then
+    VENV_PYTHON_VERSION=$(backend/venv/bin/python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")' 2>/dev/null || echo "0.0")
+    VENV_MAJOR=$(echo $VENV_PYTHON_VERSION | cut -d. -f1)
+    VENV_MINOR=$(echo $VENV_PYTHON_VERSION | cut -d. -f2)
+    
+    if [ "$VENV_MAJOR" -eq 3 ] && [ "$VENV_MINOR" -ge 9 ] && [ "$VENV_MINOR" -lt 14 ]; then
+        VENV_PYTHON_OK=true
+        print_success "Found existing virtual environment with Python $VENV_PYTHON_VERSION"
+    fi
+fi
+
+# Check system Python version
+PYTHON_VERSION=$(get_python_version)
+PYTHON_MAJOR=$(echo $PYTHON_VERSION | cut -d. -f1)
+PYTHON_MINOR=$(echo $PYTHON_VERSION | cut -d. -f2)
+
+print_info "Detected system Python $PYTHON_VERSION"
+
+# If venv exists with compatible Python, skip version check
+if [ "$VENV_PYTHON_OK" = true ]; then
+    print_info "Using existing virtual environment (Python $VENV_PYTHON_VERSION)"
+else
+    # Warn about Python 3.14+ (too new, compatibility issues)
+    if [ "$PYTHON_MAJOR" -eq 3 ] && [ "$PYTHON_MINOR" -ge 14 ]; then
+        print_warning "Python 3.14+ detected. This version has compatibility issues with some dependencies."
+        print_warning "Recommended: Use Python 3.9-3.13 for best compatibility."
+        print_warning ""
+        print_warning "To install Python 3.13 on macOS:"
+        print_warning "  brew install python@3.13"
+        print_warning "  Then create venv with: python3.13 -m venv backend/venv"
+        print_warning ""
+        print_warning "Attempting to continue anyway..."
+        echo ""
+    fi
+
+    # Warn about Python < 3.9
+    if [ "$PYTHON_MAJOR" -eq 3 ] && [ "$PYTHON_MINOR" -lt 9 ]; then
+        print_warning "Python $PYTHON_VERSION detected. Python 3.9+ is recommended."
+    fi
 fi
 
 if ! command_exists node; then
@@ -72,39 +132,49 @@ if ! command_exists npm; then
     exit 1
 fi
 
+# Ollama is optional now (can use Groq or other providers)
 if ! command_exists ollama; then
-    print_error "Ollama is not installed. Please install Ollama from https://ollama.ai"
-    exit 1
+    print_warning "Ollama is not installed. You can use Groq API or other LLM providers."
+    print_warning "To install Ollama: https://ollama.ai"
+    OLLAMA_AVAILABLE=false
+else
+    OLLAMA_AVAILABLE=true
 fi
 
-print_success "All prerequisites are installed"
+print_success "All required prerequisites are installed"
 echo ""
 
-# Check if Ollama is running
-print_info "Checking Ollama service..."
-if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
-    print_error "Ollama is not running. Please start Ollama first:"
-    print_error "  Run: ollama serve"
-    exit 1
+# Check if Ollama is running (optional)
+if [ "$OLLAMA_AVAILABLE" = true ]; then
+    print_info "Checking Ollama service..."
+    if curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
+        # Check if mistral model is available
+        if ! ollama list | grep -q "mistral"; then
+            print_warning "Mistral model not found. You can pull it with:"
+            print_warning "  ollama pull mistral:latest"
+        else
+            print_success "Ollama is running with Mistral model"
+        fi
+    else
+        print_warning "Ollama is not running. You can start it with:"
+        print_warning "  ollama serve"
+        print_warning "Or configure Groq API in backend/.env"
+    fi
+    echo ""
 fi
-
-# Check if mistral model is available
-if ! ollama list | grep -q "mistral"; then
-    print_warning "Mistral model not found. Pulling mistral:latest..."
-    ollama pull mistral:latest
-fi
-
-print_success "Ollama is running with Mistral model"
-echo ""
 
 # Setup Backend
 print_info "Setting up backend..."
 cd backend
 
-# Create virtual environment if it doesn't exist
-if [ ! -d "venv" ]; then
+# Create virtual environment if it doesn't exist or if it needs to be recreated
+if [ "$VENV_PYTHON_OK" = true ]; then
+    print_info "Using existing virtual environment..."
+elif [ ! -d "venv" ]; then
     print_info "Creating Python virtual environment..."
     python3 -m venv venv
+else
+    print_info "Virtual environment already exists"
 fi
 
 # Activate virtual environment
@@ -113,8 +183,25 @@ source venv/bin/activate
 
 # Install dependencies
 print_info "Installing Python dependencies..."
-pip install -q --upgrade pip
-pip install -q -r requirements.txt
+pip install --upgrade pip setuptools wheel
+
+# Try to install dependencies with better error handling
+if pip install -r requirements.txt; then
+    print_success "Python dependencies installed successfully"
+else
+    print_error "Failed to install some Python dependencies"
+    print_error ""
+    print_error "Common issues:"
+    print_error "1. Python 3.14+ is not supported (use Python 3.9-3.13)"
+    print_error "2. Missing Rust compiler (needed for pydantic-core, tiktoken)"
+    print_error ""
+    print_error "To fix:"
+    print_error "  - Use Python 3.13: brew install python@3.13"
+    print_error "  - Or install Rust: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+    print_error ""
+    print_error "Check logs above for specific errors"
+    exit 1
+fi
 
 # Check if .env exists
 if [ ! -f ".env" ]; then
