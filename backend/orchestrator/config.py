@@ -19,6 +19,12 @@ class OrchestratorConfig:
     ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
     
+    # LangSmith Configuration (for tracing and monitoring)
+    LANGSMITH_TRACING: bool = os.getenv("LANGSMITH_TRACING", "false").lower() == "true"
+    LANGSMITH_ENDPOINT: str = os.getenv("LANGSMITH_ENDPOINT", "https://api.smith.langchain.com")
+    LANGSMITH_API_KEY: str = os.getenv("LANGSMITH_API_KEY", "")
+    LANGSMITH_PROJECT: str = os.getenv("LANGSMITH_PROJECT", "slide-ai")
+    
     # Ollama Configuration
     OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
     
@@ -166,6 +172,11 @@ class OrchestratorConfig:
             print(f"Ollama Base URL: {cls.OLLAMA_BASE_URL}")
         elif cls.LLM_PROVIDER == "groq":
             print(f"Groq Model: {cls.GROQ_MODEL}")
+        print("-" * 60)
+        print(f"LangSmith Tracing: {'Enabled' if cls.LANGSMITH_TRACING else 'Disabled'}")
+        if cls.LANGSMITH_TRACING:
+            print(f"LangSmith Project: {cls.LANGSMITH_PROJECT}")
+            print(f"LangSmith Endpoint: {cls.LANGSMITH_ENDPOINT}")
         print("=" * 60)
 
 

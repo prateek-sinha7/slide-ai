@@ -16,17 +16,18 @@ PyJWT==2.8.0
 python-pptx==0.6.23
 
 # LangChain and LLM integration
-langchain==0.1.0
-langchain-openai==0.0.2
-langchain-anthropic==0.0.1
-langchain-community==0.0.10
-langchain-groq==0.0.1
-openai==1.6.1
-anthropic==0.8.1
-groq==0.4.1
-tiktoken==0.5.2
-pydantic==2.10.4  # Updated for better Python 3.13+ compatibility
-pydantic-core==2.27.2  # Updated for better Python 3.13+ compatibility
+langchain>=0.3.0
+langchain-openai>=0.2.0
+langchain-anthropic>=0.3.0
+langchain-community>=0.3.0
+langchain-groq>=0.2.0
+langsmith[claude-agent-sdk]>=0.1.0
+openai>=1.6.1
+anthropic>=0.8.1
+groq>=0.4.1
+tiktoken>=0.5.2
+pydantic>=2.10.4  # Updated for better Python 3.13+ compatibility
+pydantic-core>=2.27.2  # Updated for better Python 3.13+ compatibility
 
 # Testing
 pytest==7.4.3

@@ -98,7 +98,7 @@ Edit `backend/.env`:
 
 ```bash
 # Choose your LLM provider
-LLM_PROVIDER=groq  # Options: groq, anthropic, openai, ollama
+LLM_PROVIDER=anthropic  # Options: groq, anthropic, openai, ollama
 
 # Add your API key (for cloud providers)
 GROQ_API_KEY=your-groq-api-key-here
@@ -114,6 +114,23 @@ LLM_MODEL=mistral:latest
 # Agent settings
 MAX_ITERATIONS=3
 QUALITY_THRESHOLD=0.75
+
+# LangSmith (Optional - for tracing and monitoring)
+LANGSMITH_TRACING=true
+LANGSMITH_API_KEY=your-langsmith-api-key-here
+LANGSMITH_PROJECT=slide-ai
+```
+
+**📊 LangSmith Integration** (Optional but Recommended)
+
+Enable comprehensive tracing and monitoring:
+
+1. Sign up at [https://smith.langchain.com](https://smith.langchain.com)
+2. Get your API key
+3. Set `LANGSMITH_TRACING=true` in `.env`
+4. View traces at https://smith.langchain.com
+
+See [LangSmith Integration Guide](documents/LANGSMITH_INTEGRATION.md) for details.
 ```
 
 ### Start the Application
