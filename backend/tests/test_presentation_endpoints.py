@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from main import app, presentations_storage, cleanup_expired_presentations
 from auth.database import UserDatabase
 from orchestrator.models import PresentationContent, TitleSlide, AgendaSlide, SlideContent, SummarySlide
-import backend.auth.database
+import auth.database
 
 
 @pytest.fixture
@@ -20,12 +20,12 @@ def test_db():
     
     db = UserDatabase(db_path)
     
-    original_db = backend.auth.database._db_instance
-    backend.auth.database._db_instance = db
+    original_db = auth.database._db_instance
+    auth.database._db_instance = db
     
     yield db
     
-    backend.auth.database._db_instance = original_db
+    auth.database._db_instance = original_db
     
     try:
         os.unlink(db_path)
@@ -96,8 +96,8 @@ def cleanup_storage():
 
 def test_generate_presentation_success(client, auth_token, mock_presentation_content):
     """Test successful presentation generation with valid inputs."""
-    with patch('backend.main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator, \
-         patch('backend.main.ppt_generator.create_presentation') as mock_generator:
+    with patch('main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator, \
+         patch('main.ppt_generator.create_presentation') as mock_generator:
         
         mock_orchestrator.return_value = mock_presentation_content
         mock_generator.return_value = b"fake pptx data"
@@ -139,8 +139,8 @@ def test_generate_presentation_success(client, auth_token, mock_presentation_con
 
 def test_generate_presentation_with_defaults(client, auth_token, mock_presentation_content):
     """Test presentation generation with default tone and slide_count."""
-    with patch('backend.main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator, \
-         patch('backend.main.ppt_generator.create_presentation') as mock_generator:
+    with patch('main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator, \
+         patch('main.ppt_generator.create_presentation') as mock_generator:
         
         mock_orchestrator.return_value = mock_presentation_content
         mock_generator.return_value = b"fake pptx data"
@@ -275,7 +275,7 @@ def test_generate_presentation_timeout(client, auth_token):
     """Test generation timeout returns 408."""
     from orchestrator.exceptions import GenerationTimeoutError
     
-    with patch('backend.main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator:
+    with patch('main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator:
         mock_orchestrator.side_effect = GenerationTimeoutError("Timeout", agent="Pipeline")
         
         response = client.post(
@@ -295,7 +295,7 @@ def test_generate_presentation_llm_unavailable(client, auth_token):
     """Test LLM service unavailable returns 500."""
     from orchestrator.exceptions import LLMServiceUnavailableError
     
-    with patch('backend.main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator:
+    with patch('main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator:
         mock_orchestrator.side_effect = LLMServiceUnavailableError("Service unavailable", agent="Pipeline")
         
         response = client.post(
@@ -316,7 +316,7 @@ def test_generate_presentation_generation_error(client, auth_token):
     """Test generation error returns 500."""
     from orchestrator.exceptions import GenerationError as OrchestratorGenerationError
     
-    with patch('backend.main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator:
+    with patch('main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator:
         mock_orchestrator.side_effect = OrchestratorGenerationError("Generation failed", agent="Content")
         
         response = client.post(
@@ -336,8 +336,8 @@ def test_generate_presentation_ppt_error(client, auth_token, mock_presentation_c
     """Test PPT generation error returns 500."""
     from ppt_generator.generator import PPTGeneratorError
     
-    with patch('backend.main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator, \
-         patch('backend.main.ppt_generator.create_presentation') as mock_generator:
+    with patch('main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator, \
+         patch('main.ppt_generator.create_presentation') as mock_generator:
         
         mock_orchestrator.return_value = mock_presentation_content
         mock_generator.side_effect = PPTGeneratorError("PPT creation failed")
@@ -357,8 +357,8 @@ def test_generate_presentation_ppt_error(client, auth_token, mock_presentation_c
 
 def test_generate_presentation_stores_metadata(client, auth_token, mock_presentation_content):
     """Test that presentation metadata is stored correctly."""
-    with patch('backend.main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator, \
-         patch('backend.main.ppt_generator.create_presentation') as mock_generator:
+    with patch('main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator, \
+         patch('main.ppt_generator.create_presentation') as mock_generator:
         
         mock_orchestrator.return_value = mock_presentation_content
         mock_generator.return_value = b"fake pptx data"
@@ -396,8 +396,8 @@ def test_generate_presentation_stores_metadata(client, auth_token, mock_presenta
 
 def test_download_presentation_success(client, auth_token, mock_presentation_content):
     """Test successful presentation download."""
-    with patch('backend.main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator, \
-         patch('backend.main.ppt_generator.create_presentation') as mock_generator:
+    with patch('main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator, \
+         patch('main.ppt_generator.create_presentation') as mock_generator:
         
         mock_orchestrator.return_value = mock_presentation_content
         mock_generator.return_value = b"fake pptx data"
@@ -459,8 +459,8 @@ def test_download_presentation_not_found(client, auth_token):
 
 def test_download_presentation_expired(client, auth_token, mock_presentation_content):
     """Test download of expired presentation returns 404."""
-    with patch('backend.main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator, \
-         patch('backend.main.ppt_generator.create_presentation') as mock_generator:
+    with patch('main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator, \
+         patch('main.ppt_generator.create_presentation') as mock_generator:
         
         mock_orchestrator.return_value = mock_presentation_content
         mock_generator.return_value = b"fake pptx data"
@@ -493,8 +493,8 @@ def test_download_presentation_expired(client, auth_token, mock_presentation_con
 
 def test_download_presentation_file_missing(client, auth_token, mock_presentation_content):
     """Test download when file is missing from disk returns 404."""
-    with patch('backend.main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator, \
-         patch('backend.main.ppt_generator.create_presentation') as mock_generator:
+    with patch('main.orchestrator.generate_presentation_content', new_callable=AsyncMock) as mock_orchestrator, \
+         patch('main.ppt_generator.create_presentation') as mock_generator:
         
         mock_orchestrator.return_value = mock_presentation_content
         mock_generator.return_value = b"fake pptx data"

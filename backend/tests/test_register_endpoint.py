@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 from main import app
 from auth.database import UserDatabase
-import backend.auth.database
+import auth.database
 
 
 @pytest.fixture
@@ -17,12 +17,12 @@ def test_db():
     
     db = UserDatabase(db_path)
     
-    original_db = backend.auth.database._db_instance
-    backend.auth.database._db_instance = db
+    original_db = auth.database._db_instance
+    auth.database._db_instance = db
     
     yield db
     
-    backend.auth.database._db_instance = original_db
+    auth.database._db_instance = original_db
     
     try:
         os.unlink(db_path)

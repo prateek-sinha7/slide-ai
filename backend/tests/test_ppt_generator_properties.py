@@ -235,7 +235,7 @@ def test_property_9_topic_sanitization(topic):
     title=st.text(min_size=1, max_size=100),
     subtitle=st.one_of(st.none(), st.text(max_size=150)),
     agenda_items=st.lists(st.text(min_size=1, max_size=50), min_size=1, max_size=10),
-    num_slides=st.integers(min_value=1, max_size=10),
+    num_slides=st.integers(min_value=1, max_value=10),
     takeaways=st.lists(st.text(min_size=1, max_size=100), min_size=1, max_size=5)
 )
 def test_property_15_content_preservation_in_ppt(

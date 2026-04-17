@@ -20,8 +20,10 @@ langchain==0.1.0
 langchain-openai==0.0.2
 langchain-anthropic==0.0.1
 langchain-community==0.0.10
+langchain-groq==0.0.1
 openai==1.6.1
 anthropic==0.8.1
+groq==0.4.1
 tiktoken==0.5.2
 pydantic==2.10.4  # Updated for better Python 3.13+ compatibility
 pydantic-core==2.27.2  # Updated for better Python 3.13+ compatibility
@@ -33,3 +35,6 @@ hypothesis==6.92.1
 
 # HTTP client for testing
 httpx==0.25.2
+
+# Web search for agent tools
+duckduckgo-search==4.1.1

@@ -1,11 +1,11 @@
 # 🎨 AI PowerPoint Generator
 
-> **Generate professional PowerPoint presentations in minutes using AI - completely free and private!**
+> **Generate professional PowerPoint presentations in minutes using AI-powered multi-agent system**
 
-A full-stack web application powered by a multi-agent LangChain system with local Mistral LLM that creates stunning presentations from simple text prompts.
+A full-stack web application that uses LangChain ReAct agents to create stunning presentations from simple text prompts. Supports multiple LLM providers including Groq, Anthropic Claude, OpenAI, and local Ollama.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.9-3.13](https://img.shields.io/badge/python-3.9--3.13-blue.svg)](https://www.python.org/downloads/)
 [![Next.js 14](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
 
@@ -14,40 +14,38 @@ A full-stack web application powered by a multi-agent LangChain system with loca
 ## ✨ Features
 
 ### 🤖 AI-Powered Generation
-- **Multi-Agent System**: 4 specialized AI agents (Planner, Writer, Editor, Designer)
-- **Local LLM**: Uses Mistral 7B via Ollama - no API costs, complete privacy
-- **Smart Content**: Structured outlines, detailed bullet points, and professional flow
-- **Quality Assurance**: Multi-stage review process ensures high-quality output
+- **4 ReAct Agents**: Autonomous agents with reasoning loops (Planner, Content, Reviewer, Designer)
+- **Multi-LLM Support**: Groq, Anthropic Claude, OpenAI, Ollama
+- **Smart Tools**: 10+ specialized tools for quality validation and optimization
+- **Iterative Refinement**: Agents iterate 1-5 times until quality thresholds are met
+- **Memory System**: Conversation memory and cross-agent result caching
 
 ### 🎯 Customization
 - **Flexible Topics**: Generate presentations on any subject
-- **Tone Control**: Choose from Formal, Casual, Fun, or Professional
-- **Slide Count**: 5-20 slides based on your needs
-- **Professional Templates**: Clean, modern slide designs
+- **Tone Control**: Professional, Formal, Casual, or Fun
+- **Slide Count**: 5-20 slides
+- **Professional Design**: Clean, modern slide layouts
 
-### 🔒 Security & Privacy
+### 🔒 Security
 - **JWT Authentication**: Secure user accounts
 - **Password Hashing**: bcrypt encryption
-- **100% Local**: All data stays on your machine
-- **No Cloud Dependencies**: Works completely offline
+- **SQLite Database**: Local user management
 
 ### 💎 User Experience
-- **Modern UI**: Beautiful gradient design with glass-morphism effects
-- **Real-time Progress**: Live updates with stage indicators
-- **Fast Generation**: 2-3 minutes for complete presentations
-- **Automatic Download**: Presentations download directly to your computer
+- **Modern UI**: Beautiful gradient design with glass-morphism
+- **Real-time Progress**: Live updates through 5 generation stages
+- **Fast Generation**: 1-3 minutes for complete presentations
+- **Automatic Download**: Direct .pptx file download
 
 ---
 
 ## 🏗️ Architecture
 
-### High-Level Overview
-
 ```
-┌─────────────┐      ┌─────────────┐      ┌─────────────┐      ┌─────────────┐
-│   Next.js   │ ───> │   FastAPI   │ ───> │ Orchestrator│ ───> │   Ollama    │
-│   Frontend  │ <─── │   Backend   │ <─── │  (4 Agents) │ <─── │  (Mistral)  │
-└─────────────┘      └─────────────┘      └─────────────┘      └─────────────┘
+┌─────────────┐      ┌─────────────┐      ┌──────────────┐      ┌─────────────┐
+│   Next.js   │ ───> │   FastAPI   │ ───> │ Orchestrator │ ───> │ LLM Provider│
+│   Frontend  │ <─── │   Backend   │ <─── │  (4 Agents)  │ <─── │ (Multi-LLM) │
+└─────────────┘      └─────────────┘      └──────────────┘      └─────────────┘
                               │
                               ↓
                      ┌─────────────────┐
@@ -58,12 +56,12 @@ A full-stack web application powered by a multi-agent LangChain system with loca
 
 ### Multi-Agent Pipeline
 
-1. **Planner Agent** (30s) - Creates logical outline with slide titles
-2. **Content Agent** (40s) - Generates 3-6 bullet points per slide
-3. **Reviewer Agent** (40s) - Refines content and ensures quality
-4. **Design Agent** (90s) - Assigns layouts and speaker notes
+1. **Planner Agent** - Creates logical outline with slide titles
+2. **Content Agent** - Generates 3-6 bullet points per slide
+3. **Reviewer Agent** - Refines content and ensures quality
+4. **Design Agent** - Assigns layouts and speaker notes
 
-**Total Time**: 2-3 minutes for a complete presentation
+**Total Time**: 1-3 minutes (cloud APIs) or 3-5 minutes (local Ollama)
 
 ---
 
@@ -71,127 +69,62 @@ A full-stack web application powered by a multi-agent LangChain system with loca
 
 ### Prerequisites
 
-- **Python 3.9+** - [Download](https://www.python.org/downloads/)
-- **Node.js 16+** - [Download](https://nodejs.org/)
-- **Ollama** - [Download](https://ollama.ai/)
+- **Python 3.9-3.13** ([Download](https://www.python.org/downloads/)) ⚠️ Python 3.14+ not supported
+- **Node.js 16+** ([Download](https://nodejs.org/))
+- **LLM Provider** (choose one):
+  - **Groq API** (Recommended) - [Get API Key](https://console.groq.com)
+  - **Anthropic Claude** - [Get API Key](https://console.anthropic.com)
+  - **OpenAI** - [Get API Key](https://platform.openai.com)
+  - **Ollama** (Local) - [Download](https://ollama.ai/)
 
-### Automated Setup (Recommended)
+### Installation
 
 ```bash
 # 1. Clone the repository
 git clone <your-repo-url>
 cd SlideGenAI
 
-# 2. Install and start Ollama
-ollama serve
-
-# 3. Pull Mistral model (in another terminal)
-ollama pull mistral:latest
-
-# 4. Run the setup script
+# 2. Run setup script
 ./setup.sh
-```
 
-The script will:
-- ✅ Check all prerequisites
-- ✅ Create Python virtual environment
-- ✅ Install all dependencies
-- ✅ Start backend on http://localhost:8000
-- ✅ Start frontend on http://localhost:3000
-
-### Manual Setup
-
-<details>
-<summary>Click to expand manual setup instructions</summary>
-
-#### Backend Setup
-
-```bash
-# Navigate to backend
+# 3. Configure LLM provider
 cd backend
-
-# Create virtual environment
-python3 -m venv venv
-
-# Activate virtual environment
-source venv/bin/activate  # macOS/Linux
-# or
-venv\Scripts\activate     # Windows
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Configure environment
-cp .env.example .env
-# Edit .env with your settings
-
-# Run backend
-python main.py
+nano .env  # Add your API key and configure provider
 ```
 
-#### Frontend Setup
+### Configuration
+
+Edit `backend/.env`:
 
 ```bash
-# Navigate to frontend
-cd frontend
+# Choose your LLM provider
+LLM_PROVIDER=groq  # Options: groq, anthropic, openai, ollama
 
-# Install dependencies
-npm install
+# Add your API key (for cloud providers)
+GROQ_API_KEY=your-groq-api-key-here
+# OR
+ANTHROPIC_API_KEY=your-anthropic-api-key-here
+# OR
+OPENAI_API_KEY=your-openai-api-key-here
 
-# Configure environment
-cp .env.example .env.local
-# Edit .env.local with your settings
+# For Ollama (local)
+OLLAMA_BASE_URL=http://localhost:11434
+LLM_MODEL=mistral:latest
 
-# Run frontend
-npm run dev
+# Agent settings
+MAX_ITERATIONS=3
+QUALITY_THRESHOLD=0.75
 ```
 
-#### Start Ollama
+### Start the Application
 
 ```bash
-# In a separate terminal
-ollama serve
+# Backend will start on http://localhost:8000
+# Frontend will start on http://localhost:3000
 
-# Pull Mistral model
-ollama pull mistral:latest
-```
-
-</details>
-
-### Stop Servers
-
-```bash
+# To stop servers
 ./stop.sh
 ```
-
----
-
-## 📖 Usage
-
-### 1. Open the Application
-Navigate to **http://localhost:3000** in your browser
-
-### 2. Create an Account
-- Click "Register"
-- Enter username and password
-- You'll be automatically logged in
-
-### 3. Generate a Presentation
-- **Topic**: Enter your presentation topic (e.g., "Artificial Intelligence")
-- **Tone**: Choose Professional, Formal, Casual, or Fun
-- **Slides**: Select 5-20 slides (default: 8)
-- Click **"Generate Presentation"**
-
-### 4. Watch the Progress
-The system will show real-time progress through 5 stages:
-- 📋 Planning (creating outline)
-- ✍️ Content (generating bullets)
-- 🔍 Review (refining content)
-- 🎨 Design (assigning layouts)
-- 📦 Export (creating file)
-
-### 5. Download Your Presentation
-The .pptx file will automatically download to your Downloads folder!
 
 ---
 
@@ -201,14 +134,14 @@ The .pptx file will automatically download to your Downloads folder!
 SlideGenAI/
 ├── frontend/                    # Next.js Frontend
 │   ├── app/
-│   │   ├── layout.tsx          # Root layout with AuthProvider
+│   │   ├── layout.tsx          # Root layout
 │   │   ├── page.tsx            # Main generator page
 │   │   ├── auth/page.tsx       # Login/Registration
 │   │   └── globals.css         # Global styles
 │   ├── components/
-│   │   ├── PromptForm.tsx      # Input form with visual controls
-│   │   ├── ProgressIndicator.tsx  # Real-time progress display
-│   │   ├── ErrorDisplay.tsx    # Error handling UI
+│   │   ├── PromptForm.tsx      # Input form
+│   │   ├── ProgressIndicator.tsx  # Progress display
+│   │   ├── ErrorDisplay.tsx    # Error handling
 │   │   ├── LoginForm.tsx       # Login component
 │   │   └── RegistrationForm.tsx  # Registration component
 │   ├── contexts/
@@ -221,7 +154,7 @@ SlideGenAI/
 │   ├── main.py                 # FastAPI app & endpoints
 │   ├── config.py               # Configuration
 │   │
-│   ├── auth/                   # Authentication Module
+│   ├── auth/                   # Authentication
 │   │   ├── service.py          # User registration/login
 │   │   ├── jwt.py              # JWT token management
 │   │   ├── password.py         # Password hashing
@@ -234,15 +167,23 @@ SlideGenAI/
 │   │   ├── error_handlers.py  # Error handling
 │   │   └── exceptions.py       # Custom exceptions
 │   │
-│   ├── orchestrator/           # LLM Multi-Agent System ⭐
+│   ├── orchestrator/           # LLM Multi-Agent System
 │   │   ├── orchestrator.py     # Main coordinator
 │   │   ├── planner_agent.py    # Outline generation
 │   │   ├── content_agent.py    # Content generation
 │   │   ├── reviewer_agent.py   # Content refinement
 │   │   ├── design_agent.py     # Layout assignment
+│   │   ├── memory.py           # Memory system
 │   │   ├── models.py           # Pydantic models
 │   │   ├── config.py           # Orchestrator config
-│   │   └── exceptions.py       # Custom exceptions
+│   │   ├── exceptions.py       # Custom exceptions
+│   │   └── tools/              # Agent Tools
+│   │       ├── base_tool.py
+│   │       ├── planner_tools.py
+│   │       ├── content_tools.py
+│   │       ├── reviewer_tools.py
+│   │       ├── design_tools.py
+│   │       └── tool_registry.py
 │   │
 │   ├── ppt_generator/          # PowerPoint Generation
 │   │   ├── generator.py        # PPT creation logic
@@ -251,24 +192,24 @@ SlideGenAI/
 │   ├── tests/                  # Test Suite
 │   │   ├── test_auth_*.py      # Auth tests
 │   │   ├── test_ppt_*.py       # PPT tests
-│   │   └── test_integration_*.py  # Integration tests
+│   │   ├── test_*_agent.py     # Agent tests
+│   │   └── test_e2e_*.py       # Integration tests
 │   │
 │   ├── temp_presentations/     # Temporary storage
 │   ├── users.db                # SQLite database
 │   └── requirements.txt        # Dependencies
 │
 ├── .kiro/                      # Kiro AI Specs
-│   └── specs/ai-ppt-generator/
-│       ├── requirements.md     # Feature requirements
-│       ├── design.md           # Technical design
-│       └── tasks.md            # Implementation tasks
+│   └── specs/
+│       ├── ai-ppt-generator/   # Original spec
+│       └── langchain-deep-agents/  # ReAct agents spec
+│
+├── logs/                       # Application logs
+│   ├── backend.log
+│   └── frontend.log
 │
 ├── setup.sh                    # Automated setup script
 ├── stop.sh                     # Stop servers script
-├── START_HERE.md               # Quick start guide
-├── DEMO_PRESENTATION_GUIDE.md  # Demo documentation
-├── ARCHITECTURE_DIAGRAMS.md    # Technical diagrams
-├── SIMPLE_ARCHITECTURE_DIAGRAM.md  # Non-technical diagrams
 └── README.md                   # This file
 ```
 
@@ -277,152 +218,125 @@ SlideGenAI/
 ## 💻 Technology Stack
 
 ### Frontend
-| Technology | Purpose |
-|------------|---------|
-| **Next.js 14** | React framework with server-side rendering |
-| **TypeScript** | Type safety and better developer experience |
-| **React 18** | UI component library |
-| **Axios** | HTTP client for API calls |
-| **CSS-in-JS** | Scoped styling with CSS variables |
-| **JWT** | Token-based authentication |
+- **Next.js 14** - React framework
+- **TypeScript** - Type safety
+- **React 18** - UI library
+- **Axios** - HTTP client
+- **JWT** - Authentication
 
 ### Backend
-| Technology | Purpose |
-|------------|---------|
-| **FastAPI** | High-performance Python web framework |
-| **LangChain** | LLM application framework |
-| **Ollama** | Local LLM runtime |
-| **Mistral 7B** | Open-source language model |
-| **Pydantic v2** | Data validation and settings |
-| **python-pptx** | PowerPoint file generation |
-| **bcrypt** | Password hashing |
-| **PyJWT** | JWT token management |
-| **SQLite** | User database |
-| **pytest** | Testing framework |
+- **FastAPI** - Python web framework
+- **LangChain** - LLM agent framework
+- **Pydantic v2** - Data validation
+- **python-pptx** - PowerPoint generation
+- **bcrypt** - Password hashing
+- **PyJWT** - JWT tokens
+- **SQLite** - User database
+- **pytest** - Testing
 
 ### AI/LLM
-| Component | Description |
-|-----------|-------------|
-| **Ollama** | Runs Mistral locally on port 11434 |
-| **Mistral 7B** | 7 billion parameter model (4.4 GB) |
-| **LangChain** | Orchestrates multi-agent pipeline |
-| **4 Agents** | Planner, Content, Reviewer, Designer |
+- **LangChain ReAct Agents** - 4 autonomous agents
+- **Multi-Provider Support** - Groq, Anthropic, OpenAI, Ollama
+- **10+ Specialized Tools** - Quality validation, grammar checking, layout optimization
+- **Memory System** - Conversation memory + result caching
 
 ---
 
-## ⚙️ Configuration
+## ⚙️ LLM Provider Setup
 
-### Backend Configuration (`backend/.env`)
+### Option 1: Groq (Recommended - Fast & Affordable)
 
+1. Get API key from [console.groq.com](https://console.groq.com)
+2. Update `backend/.env`:
 ```bash
-# LLM Provider (ollama, openai, anthropic)
+LLM_PROVIDER=groq
+GROQ_API_KEY=gsk_your_key_here
+GROQ_MODEL=llama-3.3-70b-versatile
+```
+
+**Available Models:**
+- `llama-3.3-70b-versatile` (Recommended)
+- `mixtral-8x7b-32768`
+- `llama-3.1-8b-instant` (Fastest)
+
+### Option 2: Anthropic Claude (High Quality)
+
+1. Get API key from [console.anthropic.com](https://console.anthropic.com)
+2. Update `backend/.env`:
+```bash
+LLM_PROVIDER=anthropic
+ANTHROPIC_API_KEY=sk-ant-your_key_here
+LLM_MODEL=claude-sonnet-4-20250514
+```
+
+**Cost:** ~$0.19 per presentation
+
+### Option 3: OpenAI
+
+1. Get API key from [platform.openai.com](https://platform.openai.com)
+2. Update `backend/.env`:
+```bash
+LLM_PROVIDER=openai
+OPENAI_API_KEY=sk-your_key_here
+LLM_MODEL=gpt-4
+```
+
+### Option 4: Ollama (Local - Free & Private)
+
+1. Install Ollama from [ollama.ai](https://ollama.ai/)
+2. Start Ollama: `ollama serve`
+3. Pull model: `ollama pull mistral:latest`
+4. Update `backend/.env`:
+```bash
 LLM_PROVIDER=ollama
-LLM_MODEL=mistral:latest
-LLM_TEMPERATURE=0.7
-LLM_MAX_TOKENS=2000
-
-# Ollama Configuration
 OLLAMA_BASE_URL=http://localhost:11434
-
-# Timeouts (seconds) - Adjusted for local model
-PLANNER_TIMEOUT=90
-CONTENT_TIMEOUT=120
-REVIEWER_TIMEOUT=120
-DESIGN_TIMEOUT=90
-PIPELINE_TIMEOUT=420
-
-# API Configuration
-API_HOST=0.0.0.0
-API_PORT=8000
-
-# JWT Configuration
-JWT_SECRET_KEY=your-secret-key-here
-JWT_ALGORITHM=HS256
-JWT_EXPIRATION_HOURS=24
-
-# File Configuration
-TEMP_FILE_DIR=temp_presentations
-FILE_EXPIRATION_HOURS=1
-DEFAULT_SLIDE_COUNT=8
-```
-
-### Frontend Configuration (`frontend/.env.local`)
-
-```bash
-NEXT_PUBLIC_API_URL=http://localhost:8000
+LLM_MODEL=mistral:latest
 ```
 
 ---
 
-## 🧪 Testing
+## 🎯 Usage
 
-### Backend Tests
-
-```bash
-cd backend
-source venv/bin/activate
-pytest
-
-# Run specific test file
-pytest tests/test_auth_service.py
-
-# Run with coverage
-pytest --cov=. --cov-report=html
-```
-
-### Frontend Tests
-
-```bash
-cd frontend
-npm test
-
-# Run with coverage
-npm test -- --coverage
-
-# Run specific test
-npm test -- PromptForm.test.tsx
-```
-
-### Integration Tests
-
-```bash
-cd backend
-pytest tests/test_integration_e2e.py -v
-```
+1. **Open** http://localhost:3000
+2. **Register** a new account
+3. **Enter** your presentation topic
+4. **Choose** tone and slide count
+5. **Generate** and download your .pptx file!
 
 ---
 
 ## 📊 Performance
 
-### Generation Times (Mistral 7B Local)
-- **5 slides**: ~2-3 minutes
-- **8 slides**: ~3-4 minutes
-- **20 slides**: ~5-7 minutes
+| Provider | 8 Slides | Quality | Cost |
+|----------|----------|---------|------|
+| **Groq** | ~60-90s | ⭐⭐⭐⭐ | Free (with limits) |
+| **Anthropic** | ~90-120s | ⭐⭐⭐⭐⭐ | ~$0.19 |
+| **OpenAI** | ~90-120s | ⭐⭐⭐⭐⭐ | ~$0.30 |
+| **Ollama** | ~3-4min | ⭐⭐⭐ | Free |
 
-### Agent Breakdown
-- **Planner**: 20-30 seconds
-- **Content**: 25-35 seconds
-- **Reviewer**: 30-40 seconds
-- **Design**: 50-90 seconds
-- **PPT Generation**: <1 second
+---
 
-### Resource Usage
-- **RAM**: 2-3 GB (Ollama + Mistral)
-- **CPU**: Moderate during generation
-- **Disk**: 4.4 GB (Mistral model)
-- **Network**: None (fully local)
+## 🧪 Testing
+
+```bash
+# Backend tests
+cd backend
+source venv/bin/activate
+pytest
+
+# Frontend tests
+cd frontend
+npm test
+```
 
 ---
 
 ## 🐛 Troubleshooting
 
-### Python 3.14+ Compatibility Issues
-
-**Error:** `TypeError: ForwardRef._evaluate() missing 1 required keyword-only argument`
-
-**Solution:** Python 3.14 is too new. Use Python 3.9-3.13:
+### Python 3.14+ Not Supported
 ```bash
-brew install python@3.13
+# Use Python 3.9-3.13
+brew install python@3.13  # macOS
 cd backend
 rm -rf venv
 python3.13 -m venv venv
@@ -430,160 +344,38 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Missing Rust Compiler
-
-**Error:** `error: can't find Rust compiler`
-
-**Solution:** Install Rust:
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source $HOME/.cargo/env
-```
-
-### Ollama Not Running
-
-```bash
-# Check if Ollama is running
-curl http://localhost:11434/api/tags
-
-# If not running, start it
-ollama serve
-
-# Pull Mistral model if needed
-ollama pull mistral:latest
-```
-
 ### Port Already in Use
-
 ```bash
-# Kill process on port 8000 (backend)
-lsof -ti :8000 | xargs kill -9
-
-# Kill process on port 3000 (frontend)
-lsof -ti :3000 | xargs kill -9
-
-# Or use the stop script
 ./stop.sh
+# Or manually:
+lsof -ti :8000 | xargs kill -9  # Backend
+lsof -ti :3000 | xargs kill -9  # Frontend
 ```
 
-### Backend Fails to Start
-
-```bash
-# Check logs
-cat logs/backend.log
-
-# Common issues:
-# 1. Missing .env file → Copy from .env.example
-# 2. Dependencies not installed → pip install -r requirements.txt
-# 3. Ollama not running → ollama serve
-# 4. Wrong Python version → Use Python 3.9-3.13
-```
-
-### Frontend Fails to Start
-
-```bash
-# Check logs
-cat logs/frontend.log
-
-# Common issues:
-# 1. Missing .env.local → Copy from .env.example
-# 2. Dependencies not installed → npm install
-# 3. Port 3000 in use → Kill process or change port
-```
-
-### Generation Timeout
-
-If generation times out:
-1. Increase timeouts in `backend/.env`
-2. Reduce slide count
-3. Use a faster model (if available)
-4. Check system resources
-
-**For more detailed troubleshooting, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md)**
-
----
-
-## 📚 Documentation
-
-- **[START_HERE.md](START_HERE.md)** - Quick start guide
-- **[DEMO_PRESENTATION_GUIDE.md](DEMO_PRESENTATION_GUIDE.md)** - Complete demo guide with technical details
-- **[ARCHITECTURE_DIAGRAMS.md](ARCHITECTURE_DIAGRAMS.md)** - Technical architecture diagrams
-- **[SIMPLE_ARCHITECTURE_DIAGRAM.md](SIMPLE_ARCHITECTURE_DIAGRAM.md)** - Non-technical diagrams for everyone
-- **[QUICK_DEMO_REFERENCE.md](QUICK_DEMO_REFERENCE.md)** - Quick reference for demos
-
----
-
-## 🎯 Use Cases
-
-- **Business Presentations**: Sales pitches, quarterly reviews, project updates
-- **Educational Content**: Lectures, training materials, workshops
-- **Conference Talks**: Technical presentations, keynotes
-- **Marketing**: Product launches, campaign overviews
-- **Research**: Academic presentations, thesis defenses
-- **Personal**: Event planning, hobby presentations
-
----
-
-## 🚀 Future Enhancements
-
-- [ ] **Image Generation**: AI-generated images for slides
-- [ ] **Custom Themes**: User-uploadable PowerPoint templates
-- [ ] **Presentation History**: Save and manage past presentations
-- [ ] **Collaboration**: Share and edit presentations
-- [ ] **Export Formats**: PDF, Google Slides, Keynote
-- [ ] **Voice Narration**: AI-generated speaker audio
-- [ ] **Real-time Editing**: Edit content before download
-- [ ] **Analytics**: Track presentation effectiveness
-- [ ] **Multi-language**: Support for multiple languages
-- [ ] **Cloud Sync**: Optional cloud backup
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### LLM Provider Errors
+- **Groq Rate Limit**: Wait for reset or switch models
+- **Invalid API Key**: Check key format and validity
+- **Ollama Not Running**: Run `ollama serve`
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see LICENSE file for details
 
 ---
 
 ## 🙏 Acknowledgments
 
-- **LangChain** - For the amazing LLM framework
-- **Ollama** - For making local LLMs accessible
-- **Mistral AI** - For the excellent open-source model
-- **FastAPI** - For the high-performance web framework
-- **Next.js** - For the modern React framework
-- **python-pptx** - For PowerPoint generation capabilities
-
----
-
-## 📞 Support
-
-For issues, questions, or suggestions:
-- Open an issue on GitHub
-- Check the documentation in the `/docs` folder
-- Review the troubleshooting section above
-
----
-
-## ⭐ Star History
-
-If you find this project useful, please consider giving it a star! ⭐
+- **LangChain** - LLM agent framework
+- **Groq** - Fast cloud inference
+- **Anthropic** - Claude AI
+- **OpenAI** - GPT models
+- **Ollama** - Local LLM runtime
+- **FastAPI** - Web framework
+- **Next.js** - React framework
+- **python-pptx** - PowerPoint generation
 
 ---
 
 **Built with ❤️ using AI and modern web technologies**
-
-**Generate presentations in minutes, not hours! 🚀**
-# slide-ai

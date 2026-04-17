@@ -18,14 +18,14 @@ def test_db():
     db = UserDatabase(db_path)
     
     # Replace global database instance with test database
-    import backend.auth.database
-    original_db = backend.auth.database._db_instance
-    backend.auth.database._db_instance = db
+    import auth.database
+    original_db = auth.database._db_instance
+    auth.database._db_instance = db
     
     yield db
     
     # Restore original database instance
-    backend.auth.database._db_instance = original_db
+    auth.database._db_instance = original_db
     
     # Clean up temporary database file
     try:
